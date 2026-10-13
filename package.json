@@ -1,6 +1,6 @@
 {
   "name": "@pipeworx/mcp-ecfr",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "eCFR (Electronic Code of Federal Regulations) MCP.",
   "type": "module",
   "main": "src/index.ts",
@@ -26,7 +26,7 @@
     "@cloudflare/workers-types": "^4.20260405.1"
   },
   "pipeworx": {
-    "sourceHash": "v1-f24eb8feb8bd8cad26f60cbfb078d51f28a2898dc8ba1c78d68f11cbc9e20b35",
-    "sourceCommit": "76aa8f5d9b5dc2f665563030647c68e661478864"
+    "sourceHash": "v1-2fd94e7643992b022c3ed7921ded90541622f030453b4cc043b0befa91b0b700",
+    "sourceCommit": "3723e46c6d115bd4a1fd2175e6bf758555e7cb50"
   }
 }

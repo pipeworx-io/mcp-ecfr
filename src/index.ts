@@ -372,6 +372,7 @@ async function getSectionText(args: Record<string, unknown>): Promise<unknown> {
   }
 
   let date = typeof args.date === 'string' ? args.date.trim() : '';
+  const dateWasGiven = Boolean(date);
   if (!date) {
     const titlesData = await ecfrGet('/versioner/v1/titles.json');
     const titles = Array.isArray(titlesData.titles)
@@ -393,6 +394,30 @@ async function getSectionText(args: Record<string, unknown>): Promise<unknown> {
   }
   const res = await ecfrFetch(`/versioner/v1/full/${date}/title-${title}.xml?${params.toString()}`, 'application/xml');
   if (res.status === 404) {
+    // 2026-10-09: a 404 here used to always mean "doesn't exist" — but it also
+    // fires for a real section/part requested as of a date BEFORE its earliest
+    // content version (e.g. 21 CFR 211.22, earliest version 2016-11-29; asking
+    // for 2016-07-01 404s even though the section exists today). One extra GET
+    // to the versions endpoint, only on this path, tells the two apart.
+    const versionsParam = section ? `section=${encodeURIComponent(section)}` : `part=${encodeURIComponent(part)}`;
+    const versionsData = await ecfrGet(`/versioner/v1/versions/title-${title}.json?${versionsParam}`).catch(() => null);
+    const versions = Array.isArray(versionsData?.content_versions)
+      ? (versionsData!.content_versions as Array<Record<string, unknown>>)
+      : [];
+    const earliest = versions
+      .map((v) => (typeof v.date === 'string' ? v.date : null))
+      .filter((d): d is string => Boolean(d))
+      .sort()[0];
+    if (earliest && earliest > date) {
+      return {
+        error: `out_of_history: ${section ? `Section ${section}` : `Part ${part}`} in title ${title} has no content as of ${date} — its earliest available version is ${earliest}. Retry with date=${earliest} or later.`,
+        earliest_available: earliest,
+        title,
+        section: section || null,
+        part: part || null,
+        date,
+      };
+    }
     return {
       error: `${section ? `Section ${section}` : `Part ${part}`} not found in title ${title} as of ${date}. Check the number (use search_regulations to find the citation).`,
       title,
@@ -403,6 +428,11 @@ async function getSectionText(args: Record<string, unknown>): Promise<unknown> {
   }
   if (!res.ok) throw new Error(`eCFR: ${res.status} ${(await res.text()).slice(0, 200)}`);
   const xml = await res.text();
+  // 2026-10-09: the url used to hardcode /current/ even when a specific
+  // historical date was requested, which points the caller at today's text
+  // instead of the version they asked for. /on/<date>/ is eCFR's own URL
+  // scheme for a point-in-time version.
+  const datePathSegment = dateWasGiven ? `on/${date}` : 'current';
 
   // Single section: one heading + its text (original behavior).
   if (section) {
@@ -418,7 +448,7 @@ async function getSectionText(args: Record<string, unknown>): Promise<unknown> {
       date,
       citation: `${title} CFR ${section}`,
       heading,
-      url: `https://www.ecfr.gov/current/title-${title}/section-${section}`,
+      url: `https://www.ecfr.gov/${datePathSegment}/title-${title}/section-${section}`,
       truncated,
       text: truncated ? full.slice(0, CAP) : full,
     };
@@ -447,7 +477,7 @@ async function getSectionText(args: Record<string, unknown>): Promise<unknown> {
     part,
     date,
     citation: `${title} CFR Part ${part}`,
-    url: `https://www.ecfr.gov/current/title-${title}/part-${part}`,
+    url: `https://www.ecfr.gov/${datePathSegment}/title-${title}/part-${part}`,
     section_count: sections.length,
     returned: kept.length,
     truncated: kept.length < sections.length,
