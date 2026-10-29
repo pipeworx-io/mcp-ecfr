@@ -1,12 +1,20 @@
 {
   "name": "@pipeworx/mcp-ecfr",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "eCFR (Electronic Code of Federal Regulations) MCP.",
   "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./tools.json": "./tools.json",
+    "./package.json": "./package.json"
+  },
   "bin": {
     "mcp-ecfr": "bin/cli.js"
+  },
+  "files": ["bin/", "lib/", "tools.json", "server.json"],
+  "engines": {
+    "node": ">=18"
   },
   "keywords": ["mcp", "mcp-server", "model-context-protocol", "pipeworx", "ecfr"],
   "license": "MIT",
@@ -14,19 +22,12 @@
     "type": "git",
     "url": "git+https://github.com/pipeworx-io/mcp-ecfr.git"
   },
-  "scripts": {
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.30.0",
-    "tsx": "^4.19.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.9.3",
-    "@cloudflare/workers-types": "^4.20260405.1"
-  },
+  "mcpName": "io.github.pipeworx-io/ecfr",
   "pipeworx": {
-    "sourceHash": "v1-2fd94e7643992b022c3ed7921ded90541622f030453b4cc043b0befa91b0b700",
-    "sourceCommit": "3723e46c6d115bd4a1fd2175e6bf758555e7cb50"
+    "mode": "gateway",
+    "slug": "ecfr",
+    "gatewaySlug": "ecfr",
+    "sourceHash": "v1-f675bae16b5aaefebf698d67dcb61c8e42dc81c26b0599e1ed6200a6745a7d24",
+    "sourceCommit": "bb047243cf27f32453103de186b8e6a8b6a1ce79"
   }
 }
