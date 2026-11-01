@@ -1,6 +1,6 @@
 {
   "name": "@pipeworx/mcp-ecfr",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "eCFR (Electronic Code of Federal Regulations) MCP.",
   "type": "module",
   "main": "lib/index.js",
@@ -27,7 +27,7 @@
     "mode": "gateway",
     "slug": "ecfr",
     "gatewaySlug": "ecfr",
-    "sourceHash": "v1-f675bae16b5aaefebf698d67dcb61c8e42dc81c26b0599e1ed6200a6745a7d24",
-    "sourceCommit": "bb047243cf27f32453103de186b8e6a8b6a1ce79"
+    "sourceHash": "v1-24e759a5ab04406d0c41e2f19fabace632181d3414bac85af49fefc952645037",
+    "sourceCommit": "e707a4bb6209f432984c0a83bf64b3138130db89"
   }
 }
